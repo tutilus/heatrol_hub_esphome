@@ -1,0 +1,56 @@
+esphome:
+  name: heaterhub
+  comment: Heating System Heat'rol Hub
+
+  includes:
+    - heatrol_climate.h
+  libraries:
+    - https://github.com/tutilus/heatrol.git
+
+esp8266:
+  board: nodemcuv2
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  password: !secret hass_api_password
+
+ota:
+  password: !secret ota_generic_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Heater Hub Fallback Hotspot"
+    password: !secret ap_generic_password
+
+captive_portal:
+
+climate:
+- platform: custom
+  lambda: |-
+    auto heater1 = new HeatrolClimate(D1, D2, HORSGEL);
+    auto heater2 = new HeatrolClimate(D5, D6, HORSGEL);
+    auto heater3 = new HeatrolClimate(D7, D8, HORSGEL);
+    App.register_component(heater1);
+    App.register_component(heater2);
+    App.register_component(heater3);
+    return { heater1, heater2, heater3 };
+
+  climates:
+    - name: "Heater Control #1"
+      visual:
+        max_temperature: 20 °C
+
+    - name: "Heater Control #2"
+      visual:
+        max_temperature: 20 °C
+
+    - name: "Heater Control #3"
+      visual:
+        max_temperature: 20 °C
